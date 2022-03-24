@@ -1,3 +1,4 @@
+from tokenize import Double
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager,PermissionsMixin
 from django.conf import settings
@@ -60,16 +61,26 @@ class User(AbstractBaseUser):
 
     objects = UserManager()
 
-
-
-'''
-class UserList(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
-    list = models.ForeignKey(ShoppingList,on_delete=models.CASCADE)
+class Product(models.Model):
+    list = models.ForeignKey(List, on_delete=models.CASCADE)
+    name = models.CharField(max_length=20)
+    quantity = models.FloatField(null=True)
+    unit = models.TextField(null=True)
+    picture_name = models.TextField(null=True)
+    bought = models.BooleanField(default=False)
 
     class Meta:
-        db_table = "user_lists"'''
+        db_table = 'products' 
 
+    def json(self):
+        return {
+            'id':self.id,
+            'name':self.name,
+            'quantity':self.quantity,
+            'unit':self.unit,
+            'bought':self.bought,
+            'picture_name':self.picture_name
+        }
 
 
 

@@ -80,6 +80,8 @@ def product_endpoint(request,list_id,id):
 @permission_classes([IsAuthenticated])
 def product_add_endpoint(request,list_id):
     if request.method == "POST":
+
+        
         return Response({
              "list_id":list_id,
         })
