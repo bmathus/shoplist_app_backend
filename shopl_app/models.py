@@ -61,6 +61,13 @@ class User(AbstractBaseUser):
 
     objects = UserManager()
 
+    def json(self):
+        return {
+            'id':self.id,
+            'name':self.name,
+            'email':self.email, 
+        }
+
 class Product(models.Model):
     list = models.ForeignKey(List, on_delete=models.CASCADE)
     name = models.CharField(max_length=20)

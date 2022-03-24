@@ -5,7 +5,8 @@ from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view,permission_classes
 from rest_framework.response import Response
 from django.forms import model_to_dict
-from .models import User
+from .models import User,List
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class CustomAuthToken(ObtainAuthToken):
@@ -99,8 +100,21 @@ def invite_endpoint(request,list_id):
 @permission_classes([IsAuthenticated])
 def particip_endpoint(request,list_id):
     if request.method == "GET":
+        try:
+            l = List.objects.get(id=list_id)
+        except ObjectDoesNotExist:
+            return Response( 
+                {"detail":"list does not exist"},
+                status=400)
+        try:
+            user = User.objects.get(email=request.user)
+            users_l = user.user_lists.get(id=list_id)
+        except ObjectDoesNotExist:
+            return Response(status=401)
+
+        list_of_users = [i.json() for i in users_l.user_set.all()]
         return Response({
-            "list_id":list_id,
+            "users":list_of_users
         })
     
 
