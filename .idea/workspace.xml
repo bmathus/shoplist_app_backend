@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="2eee8bf1-4659-4b09-ad6e-c9d572bd6749" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/pictures.json" beforeDir="false" afterPath="$PROJECT_DIR$/pictures.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shopl_app/migrations/0001_initial.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/shopl_app/migrations/0002_alter_user_user_lists.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/shopl_app/migrations/0003_product.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/shopl_app/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/shopl_app/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shoplists_project/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/shoplists_project/settings.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="26qHCrxveIYls9pzMHzAP6kd1tO" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../enviro.env" />
+    <property name="settings.editor.selected.configurable" value="PyConsoleConfigurable.Python Console" />
+  </component>
+  <component name="PyConsoleOptionsProvider">
+    <option name="myPythonConsoleState">
+      <console-settings module-name="Backend" is-module-sdk="true">
+        <envs>
+          <env key="DB_HOST" value="127.0.0.1" />
+          <env key="DB_NAME" value="MTAA" />
+          <env key="DB_PASS" value="sudruh" />
+          <env key="DB_USER" value="postgres" />
+          <env key="SKEY" value="django-insecure-$vt9jb_$j5_yn&amp;48+q@zy!+egr2%3ub7kux%*@+7qff(i-t5=4" />
+        </envs>
+        <option name="myUseModuleSdk" value="true" />
+        <option name="myModuleName" value="Backend" />
+        <option name="myEnvs">
+          <map>
+            <entry key="DB_HOST" value="127.0.0.1" />
+            <entry key="DB_NAME" value="MTAA" />
+            <entry key="DB_PASS" value="sudruh" />
+            <entry key="DB_USER" value="postgres" />
+            <entry key="SKEY" value="django-insecure-$vt9jb_$j5_yn&amp;48+q@zy!+egr2%3ub7kux%*@+7qff(i-t5=4" />
+          </map>
+        </option>
+      </console-settings>
+    </option>
+  </component>
+  <component name="RunManager">
+    <configuration name="Django" type="PythonConfigurationType" factoryName="Python" singleton="false">
+      <module name="Backend" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+        <env name="DB_NAME" value="MTAA" />
+        <env name="DB_HOST" value="127.0.0.1" />
+        <env name="DB_USER" value="postgres" />
+        <env name="DB_PASS" value="sudruh" />
+        <env name="SKEY" value="django-insecure-$vt9jb_$j5_yn&amp;48+q@zy!+egr2%3ub7kux%*@+7qff(i-t5=4" />
+      </envs>
+      <option name="SDK_HOME" value="C:\Users\toxic\AppData\Local\Programs\Python\Python39\python.exe" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/.." />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="net.ashald.envfile">
+        <option name="IS_ENABLED" value="true" />
+        <option name="IS_SUBST" value="false" />
+        <option name="IS_PATH_MACRO_SUPPORTED" value="false" />
+        <option name="IS_IGNORE_MISSING_FILES" value="false" />
+        <option name="IS_ENABLE_EXPERIMENTAL_INTEGRATIONS" value="false" />
+        <ENTRIES>
+          <ENTRY IS_ENABLED="true" PARSER="runconfig" />
+          <ENTRY IS_ENABLED="true" PARSER="env" PATH="$PROJECT_DIR$/../enviro.env" />
+        </ENTRIES>
+      </EXTENSION>
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="2eee8bf1-4659-4b09-ad6e-c9d572bd6749" name="Default Changelist" comment="" />
+      <created>1648144072427</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1648144072427</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="361" y="53" key="#Plugins" timestamp="1648203017916">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="361" y="53" key="#Plugins/0.0.1536.824@0.0.1536.824" timestamp="1648203017916" />
+    <state x="223" y="0" width="1089" height="824" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1648203642252">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="223" y="0" width="1089" height="824" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1536.824@0.0.1536.824" timestamp="1648203642252" />
+    <state x="498" y="234" key="#com.intellij.ide.util.TreeClassChooserDialog" timestamp="1648202350317">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="498" y="234" key="#com.intellij.ide.util.TreeClassChooserDialog/0.0.1536.824@0.0.1536.824" timestamp="1648202350317" />
+    <state x="460" y="168" key="EnvironmentVariablesDialog" timestamp="1648202775801">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="460" y="168" key="EnvironmentVariablesDialog/0.0.1536.824@0.0.1536.824" timestamp="1648202775801" />
+    <state x="651" y="262" key="FileChooserDialogImpl" timestamp="1648203384394">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="651" y="262" key="FileChooserDialogImpl/0.0.1536.824@0.0.1536.824" timestamp="1648203384394" />
+    <state width="1515" height="210" key="GridCell.Tab.0.bottom" timestamp="1648202927344">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1515" height="210" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1648202927344" />
+    <state width="1515" height="210" key="GridCell.Tab.0.center" timestamp="1648202927343">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1515" height="210" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1648202927343" />
+    <state width="1515" height="210" key="GridCell.Tab.0.left" timestamp="1648202927343">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1515" height="210" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1648202927343" />
+    <state width="1515" height="210" key="GridCell.Tab.0.right" timestamp="1648202927343">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1515" height="210" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1648202927343" />
+    <state x="100" y="63" key="SettingsEditor" timestamp="1648203999726">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="100" y="63" key="SettingsEditor/0.0.1536.824@0.0.1536.824" timestamp="1648203999726" />
+    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup" timestamp="1648202965163">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup/0.0.1536.824@0.0.1536.824" timestamp="1648202965163" />
+  </component>
+</project>
