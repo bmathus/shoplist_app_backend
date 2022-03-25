@@ -4,9 +4,14 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view,permission_classes
 from rest_framework.response import Response
+<<<<<<< Updated upstream
 from django.forms import model_to_dict
 from .models import User,List
 from django.core.exceptions import ObjectDoesNotExist
+=======
+import json
+from .models import User, List, Product
+>>>>>>> Stashed changes
 
 
 class CustomAuthToken(ObtainAuthToken):
@@ -51,12 +56,23 @@ def lists_endpoint(request):
 @permission_classes([IsAuthenticated])
 def list_endpoint(request,list_id):
 
-    if request.method == 'GET':
+    if request.method == 'GET': # Getting list products
+        list_of_products = []
+        prods = Product.objects.filter(list__id=list_id)
+        for p in range(len(prods)):
+            js = prods[p].json()
+            js["picture_base64"] = None
+            with open('pictures.json', 'r') as f: # Finding and loading the image
+                pics = json.load(f)
+                for i in range(len(pics)):
+                    if pics[i]["id"] == prods[p].id:
+                        js["picture_base64"] = pics[i]["base64"]
+            list_of_products.append(js)
         return Response({
-            "list_id":list_id
+            "products": list_of_products
             })
 
-    if request.method == 'DELETE':
+    if request.method == 'DELETE': # Leaving/deleting a shopping list
         return Response({
             "list_id":list_id
             })
