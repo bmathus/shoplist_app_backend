@@ -1,17 +1,13 @@
-from shopl_app.serializers import ListNameSerializer
+from shopl_app.serializers import ListNameSerializer,InviteCodeSerializer
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view,permission_classes
 from rest_framework.response import Response
-<<<<<<< Updated upstream
 from django.forms import model_to_dict
 from .models import User,List
 from django.core.exceptions import ObjectDoesNotExist
-=======
 import json
-from .models import User, List, Product
->>>>>>> Stashed changes
 
 
 class CustomAuthToken(ObtainAuthToken):
@@ -55,10 +51,13 @@ def lists_endpoint(request):
 @api_view(['GET','DELETE'])
 @permission_classes([IsAuthenticated])
 def list_endpoint(request,list_id):
+    users_l = check_list(list_id,request.user)
+    if not isinstance(users_l,List):
+        return users_l
 
     if request.method == 'GET': # Getting list products
         list_of_products = []
-        prods = Product.objects.filter(list__id=list_id)
+        prods = users_l.product_set.all()
         for p in range(len(prods)):
             js = prods[p].json()
             js["picture_base64"] = None
@@ -97,8 +96,6 @@ def product_endpoint(request,list_id,id):
 @permission_classes([IsAuthenticated])
 def product_add_endpoint(request,list_id):
     if request.method == "POST":
-
-        
         return Response({
              "list_id":list_id,
         })
@@ -107,32 +104,54 @@ def product_add_endpoint(request,list_id):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def invite_endpoint(request,list_id):
+    print(type(request.user))
     if request.method == "POST":
-        return Response({
-            "list_id":list_id,
-        })
+        serializer = InviteCodeSerializer(data=request.data)
+        if serializer.is_valid():
+            invite_code = serializer.validated_data
+            try:
+                List.objects.get(id=list_id,invite_code=invite_code)
+            except ObjectDoesNotExist:
+                return Response({"detail":"List does not exist for given invite code and list_id"},status=400)
+
+        else:
+            return Response({"detail":"Invalid format of invite code"},status=400)
+
+        return Response()
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def particip_endpoint(request,list_id):
     if request.method == "GET":
-        try:
-            l = List.objects.get(id=list_id)
-        except ObjectDoesNotExist:
-            return Response( 
-                {"detail":"list does not exist"},
-                status=400)
-        try:
-            user = User.objects.get(email=request.user)
-            users_l = user.user_lists.get(id=list_id)
-        except ObjectDoesNotExist:
-            return Response(status=401)
+        users_l = check_list(list_id,request.user)
+        if not isinstance(users_l,List):
+            return users_l
 
         list_of_users = [i.json() for i in users_l.user_set.all()]
         return Response({
             "users":list_of_users
         })
     
+
+def check_list(list_id,request_email):
+    #check ci vobec list s danym id existuje - ak nie tak 400
+    try:
+        l = List.objects.get(id=list_id)
+    except ObjectDoesNotExist:
+        return Response( 
+            {"detail":"list does not exist"},
+            status=400)
+
+    #check ci vobec user do daneho listu patri
+    try:
+        user = User.objects.get(email=request_email)
+        users_l = user.user_lists.get(id=list_id)
+    except ObjectDoesNotExist:
+        return Response(status=401)
+
+    return users_l
+    
+
 
 
 
