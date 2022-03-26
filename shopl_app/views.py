@@ -51,29 +51,44 @@ def lists_endpoint(request):
 @api_view(['GET','DELETE'])
 @permission_classes([IsAuthenticated])
 def list_endpoint(request,list_id):
-    users_l = check_list(list_id,request.user)
+    user = User.objects.get(email=request.user)
+    users_l = check_list(list_id,user)
     if not isinstance(users_l,List):
         return users_l
 
     if request.method == 'GET': # Getting list products
         list_of_products = []
         prods = users_l.product_set.all()
-        for p in range(len(prods)):
-            js = prods[p].json()
-            js["picture_base64"] = None
-            with open('pictures.json', 'r') as f: # Finding and loading the image
-                pics = json.load(f)
+        with open('pictures.json', 'r') as f:  # Finding and loading the image
+            pics = json.load(f)
+            for p in range(len(prods)):
+                js = prods[p].json()
+                js["picture_base64"] = None
                 for i in range(len(pics)):
                     if pics[i]["id"] == prods[p].id:
                         js["picture_base64"] = pics[i]["base64"]
-            list_of_products.append(js)
+                list_of_products.append(js)
         return Response({
             "products": list_of_products
             })
 
     if request.method == 'DELETE': # Leaving/deleting a shopping list
+        ppl = users_l.num_ppl
+        msg = ""
+        if ppl == 1: # A single person remains. We will delete this list
+            prods = users_l.product_set.all()
+            for i in range(len(prods)): # Delete all products from the list
+                del_product(prods[i])
+            users_l.delete()
+            msg = "List deleted"
+        else: # Just remove the user
+            users_l.num_ppl -= 1
+            users_l.save()
+            msg = "User left the list"
+        ref = user.user_lists.get(user__id=user.id, list__id=list_id)  # Delete user_lists reference
+        ref.delete()
         return Response({
-            "list_id":list_id
+            "message": msg
             })
 
 #/list/{list_id}/product/{id}
@@ -122,8 +137,9 @@ def invite_endpoint(request,list_id):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def particip_endpoint(request,list_id):
+    user = User.objects.get(email=request.user)
     if request.method == "GET":
-        users_l = check_list(list_id,request.user)
+        users_l = check_list(list_id,user)
         if not isinstance(users_l,List):
             return users_l
 
@@ -133,18 +149,28 @@ def particip_endpoint(request,list_id):
         })
     
 
-def check_list(list_id,request_email):
+def del_product(product): # The product needs to be removed from DB, but we also may need to remove the image
+    id = product.id
+    product.delete()
+    with open('pictures.json', 'r+') as f:  # Finding the image reference
+        pics = json.load(f)
+        for i in range(len(pics)):
+            if pics[i]["id"] == id:
+                pics[i].pop() # Removing the reference from the JSON object
+                break
+        json.dump(pics, f, indent=4) # Write it back into the file
+
+def check_list(list_id,user):
     #check ci vobec list s danym id existuje - ak nie tak 400
     try:
         l = List.objects.get(id=list_id)
     except ObjectDoesNotExist:
         return Response( 
-            {"detail":"list does not exist"},
+            {"detail":"List does not exist"},
             status=400)
 
     #check ci vobec user do daneho listu patri
     try:
-        user = User.objects.get(email=request_email)
         users_l = user.user_lists.get(id=list_id)
     except ObjectDoesNotExist:
         return Response(status=401)
