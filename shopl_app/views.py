@@ -109,7 +109,8 @@ def product_endpoint(request,list_id,id):
     
     if request.method == 'PUT':
         data = request.data
-        product_check(data)
+        if not product_check(data):
+            return Response(status=400)
         prod.name = data["name"]
         prod.quantity = data["quantity"]
         prod.unit = data["unit"]
@@ -125,10 +126,11 @@ def product_endpoint(request,list_id,id):
                     else:
                         pics[i]["base64"] = data["picture_base64"] # Rewrite image
                     break
-            if found:
-                f.seek(0)
-                f.truncate()
-                json.dump(pics, f, indent=2)  # Write it back into the file
+            if not found:
+                pics.append({"id": prod.id, "base64": data["picture_base64"]})
+            f.seek(0)
+            f.truncate()
+            json.dump(pics, f, indent=2)
         prod.save()
         return Response(status=200)
     if request.method == 'DELETE':
@@ -147,7 +149,8 @@ def product_add_endpoint(request,list_id):
         return users_l
     data = request.data
     if request.method == "POST":
-        product_check(data, False) # Bought is automatically False when created. No need to receive it
+        if not product_check(data, False): # Bought is automatically False when created. No need to receive it
+            return Response(status=400)
         prod = Product(name=data["name"], quantity=data["quantity"], unit=data["unit"], bought=False,
                        list_id=list_id)
         prod.save()
@@ -158,6 +161,7 @@ def product_add_endpoint(request,list_id):
                 pics = json.load(f)
                 pics.append({"id": prod.id, "base64": data["picture_base64"]})
                 f.seek(0)
+                f.truncate()
                 json.dump(pics, f, indent=2)
         js = prod.json()
         js["picture_base64"] = data["picture_base64"]
@@ -206,7 +210,8 @@ def product_check(data, include_bought=True):
         to_test.append("bought")
     for i in range(len(to_test)):
         if not to_test[i] in data:
-            return Response(status=400)
+            return False
+    return True
 
 def del_product(product): # The product needs to be removed from DB, but we also may need to remove the image
     id = product.id
