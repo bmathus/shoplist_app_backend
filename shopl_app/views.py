@@ -116,11 +116,19 @@ def product_endpoint(request,list_id,id):
         prod.bought = data["bought"]
         with open('pictures.json', 'r+') as f:  # Finding the image reference
             pics = json.load(f)
+            found = False
             for i in range(len(pics)):
                 if pics[i]["id"] == id:
-                    pics[i]["base64"] = data["picture_base64"] # Rewrite image
+                    found = True
+                    if data["picture_base64"] is None: # Delete reference from JSON file
+                        pics.pop(i)
+                    else:
+                        pics[i]["base64"] = data["picture_base64"] # Rewrite image
                     break
-            json.dump(pics, f, indent=4)  # Write it back into the file
+            if found:
+                f.seek(0)
+                f.truncate()
+                json.dump(pics, f, indent=2)  # Write it back into the file
         prod.save()
         return Response(status=200)
     if request.method == 'DELETE':
@@ -139,18 +147,21 @@ def product_add_endpoint(request,list_id):
         return users_l
     data = request.data
     if request.method == "POST":
-        product_check(data)
-        prod = Product(name=data["name"], quantity=data["quantity"], unit=data["unit"], bought=data["bought"],
+        product_check(data, False) # Bought is automatically False when created. No need to receive it
+        prod = Product(name=data["name"], quantity=data["quantity"], unit=data["unit"], bought=False,
                        list_id=list_id)
         prod.save()
+        users_l.num_items += 1
+        users_l.save()
         if data["picture_base64"] is not None:
             with open('pictures.json', 'r+') as f:
                 pics = json.load(f)
                 pics.append({"id": prod.id, "base64": data["picture_base64"]})
-                json.dump(pics, f, indent=4)
+                f.seek(0)
+                json.dump(pics, f, indent=2)
         js = prod.json()
         js["picture_base64"] = data["picture_base64"]
-        return Response({js})
+        return Response(js)
 
 #/list/{list_id}/invite
 @api_view(['POST'])
@@ -171,6 +182,7 @@ def invite_endpoint(request,list_id):
 
         return Response()
 
+# /list/{list_id}/participants
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def particip_endpoint(request,list_id):
@@ -186,9 +198,11 @@ def particip_endpoint(request,list_id):
         })
     
 
-def product_check(data):
+def product_check(data, include_bought=True):
     # Check if data contains all fields
-    to_test = ["name", "quantity", "unit", "bought", "picture_base64"]
+    to_test = ["name", "quantity", "unit", "picture_base64"]
+    if include_bought:
+        to_test.append("bought")
     for i in range(len(to_test)):
         if not to_test[i] in data:
             return Response(status=400)
@@ -200,14 +214,16 @@ def del_product(product): # The product needs to be removed from DB, but we also
         pics = json.load(f)
         for i in range(len(pics)):
             if pics[i]["id"] == id:
-                pics[i].pop() # Removing the reference from the JSON object
+                pics.pop(i) # Removing the reference from the JSON object
                 break
-        json.dump(pics, f, indent=4) # Write it back into the file
+        f.seek(0)
+        f.truncate()
+        json.dump(pics, f, indent=2) # Write it back into the file
 
 def check_list(list_id,user):
     #check ci vobec list s danym id existuje - ak nie tak 400
     try:
-        l = List.objects.get(id=list_id) # list__id ?
+        l = List.objects.get(id=list_id)
     except ObjectDoesNotExist:
         return Response( 
             {"detail":"List does not exist"},
