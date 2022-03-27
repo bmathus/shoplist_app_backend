@@ -1,11 +1,11 @@
-from shopl_app.serializers import ListNameSerializer,InviteCodeSerializer
+from shopl_app.serializers import ListNameSerializer
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view,permission_classes
 from rest_framework.response import Response
 from django.forms import model_to_dict
-from .models import User,List
+from .models import User,List,Product
 from django.core.exceptions import ObjectDoesNotExist
 import json
 
@@ -85,7 +85,7 @@ def list_endpoint(request,list_id):
             users_l.num_ppl -= 1
             users_l.save()
             msg = "User left the list"
-        ref = user.user_lists.get(user__id=user.id, list__id=list_id)  # Delete user_lists reference
+        ref = user.user_lists.get(list__id=list_id)  # Delete user_lists reference
         ref.delete()
         return Response({
             "message": msg
@@ -95,16 +95,43 @@ def list_endpoint(request,list_id):
 @api_view(['PUT','DELETE'])
 @permission_classes([IsAuthenticated])
 def product_endpoint(request,list_id,id):
+    user = User.objects.get(email=request.user)
+    users_l = check_list(list_id, user)
+    if not isinstance(users_l, List):
+        return users_l
+    # Check if product exists and is part of given list
+    try:
+        prod = Product.objects.get(id=id)
+    except ObjectDoesNotExist:
+        return Response(status=404)
+    if prod.list_id != list_id: # Produkt nie je v danom zozname
+        return Response(status=400) # spravny http status?
+    
     if request.method == 'PUT':
-        return Response({
-            "list_id":list_id,
-            "id":id
-        })
+        data = request.data
+        # Check if data contains all fields
+        to_test = ["name", "quantity", "unit", "bought", "picture_base64"]
+        for i in range(len(to_test)):
+            if not to_test[i] in data:
+                return Response(status=400)
+        prod.name = data["name"]
+        prod.quantity = data["quantity"]
+        prod.unit = data["unit"]
+        prod.bought = data["bought"]
+        with open('pictures.json', 'r+') as f:  # Finding the image reference
+            pics = json.load(f)
+            for i in range(len(pics)):
+                if pics[i]["id"] == id:
+                    pics[i]["base64"] = data["picture_base64"] # Rewrite image
+                    break
+            json.dump(pics, f, indent=4)  # Write it back into the file
+        prod.save()
+        return Response(status=200)
     if request.method == 'DELETE':
-        return Response({
-            "list_id":list_id,
-            "id":id
-        })
+        del_product(prod)
+        users_l.num_items -= 1
+        users_l.save()
+        return Response(status=200)
 
 #/list/{list_id}/product
 @api_view(['POST'])
@@ -163,7 +190,7 @@ def del_product(product): # The product needs to be removed from DB, but we also
 def check_list(list_id,user):
     #check ci vobec list s danym id existuje - ak nie tak 400
     try:
-        l = List.objects.get(id=list_id)
+        l = List.objects.get(id=list_id) # list__id ?
     except ObjectDoesNotExist:
         return Response( 
             {"detail":"List does not exist"},

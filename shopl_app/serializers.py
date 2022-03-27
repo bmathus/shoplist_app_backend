@@ -11,5 +11,5 @@ class ListNameSerializer(serializers.ModelSerializer):
         random_uuid = str(uuid.uuid4())
         return List.objects.create(**validated_data,invite_code=random_uuid)
 
-class InviteCodeSerializer(serializers.Serializer):
-    invite_code = serializers.TextField()
+#class InviteCodeSerializer(serializers.Serializer):
+    #invite_code = serializers.TextField()
