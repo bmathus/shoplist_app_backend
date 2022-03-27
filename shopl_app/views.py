@@ -1,4 +1,5 @@
-from shopl_app.serializers import ListNameSerializer
+from shopl_app import serializers
+from shopl_app.serializers import InviteCodeSerializer, ListNameSerializer
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
@@ -171,21 +172,27 @@ def product_add_endpoint(request,list_id):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def invite_endpoint(request):
-    data = request.data
     user = User.objects.get(email=request.user)
     if request.method == "POST":
-        try:
-            ilist = List.objects.get(invite_code=data["invite_code"])
-        except ObjectDoesNotExist:
-             return Response({"detail": "List with the given invite code does not exist"},status=400)
-        try:
-            user.user_lists.get(id=ilist.id)
-            return Response({"detail": "You are already in this list."}, status=400)
-        except ObjectDoesNotExist:
-            ilist.num_ppl += 1
-            ilist.save()
-            user.user_lists.add(ilist)
-        return Response(ilist.json())
+        serializer = InviteCodeSerializer(data=request.data)
+        if serializer.is_valid():
+            invite_code = serializer.validated_data["invite_code"]
+            try:
+                ilist = List.objects.get(invite_code=invite_code)
+            except ObjectDoesNotExist:
+                return Response({"detail": "List with the given invite code does not exist"},status=400)
+            try:
+                user.user_lists.get(id=ilist.id)
+                return Response({"detail": "You are already in this list."}, status=400)
+            except ObjectDoesNotExist:
+                ilist.num_ppl += 1
+                ilist.save()
+                user.user_lists.add(ilist)
+            return Response(ilist.json())
+
+        else:
+            return Response({"detail":"invite code not valid"},status=400)
+          
 
 # /list/{list_id}/participants
 @api_view(['GET'])
