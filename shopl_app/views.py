@@ -163,24 +163,25 @@ def product_add_endpoint(request,list_id):
         js["picture_base64"] = data["picture_base64"]
         return Response(js)
 
-#/list/{list_id}/invite
+# /invite
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def invite_endpoint(request,list_id):
-    print(type(request.user))
+def invite_endpoint(request):
+    data = request.data
+    user = User.objects.get(email=request.user)
     if request.method == "POST":
-        serializer = InviteCodeSerializer(data=request.data)
-        if serializer.is_valid():
-            invite_code = serializer.validated_data
-            try:
-                List.objects.get(id=list_id,invite_code=invite_code)
-            except ObjectDoesNotExist:
-                return Response({"detail":"List does not exist for given invite code and list_id"},status=400)
-
-        else:
-            return Response({"detail":"Invalid format of invite code"},status=400)
-
-        return Response()
+        try:
+            ilist = List.objects.get(invite_code=data["invite_code"])
+        except ObjectDoesNotExist:
+             return Response({"detail": "List with the given invite code does not exist"},status=400)
+        try:
+            user.user_lists.get(id=ilist.id)
+            return Response({"detail": "You are already in this list."}, status=400)
+        except ObjectDoesNotExist:
+            ilist.num_ppl += 1
+            ilist.save()
+            user.user_lists.add(ilist)
+        return Response(ilist.json())
 
 # /list/{list_id}/participants
 @api_view(['GET'])
