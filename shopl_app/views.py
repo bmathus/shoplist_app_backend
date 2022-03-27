@@ -109,11 +109,7 @@ def product_endpoint(request,list_id,id):
     
     if request.method == 'PUT':
         data = request.data
-        # Check if data contains all fields
-        to_test = ["name", "quantity", "unit", "bought", "picture_base64"]
-        for i in range(len(to_test)):
-            if not to_test[i] in data:
-                return Response(status=400)
+        product_check(data)
         prod.name = data["name"]
         prod.quantity = data["quantity"]
         prod.unit = data["unit"]
@@ -137,10 +133,24 @@ def product_endpoint(request,list_id,id):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def product_add_endpoint(request,list_id):
+    user = User.objects.get(email=request.user)
+    users_l = check_list(list_id, user)
+    if not isinstance(users_l, List):
+        return users_l
+    data = request.data
     if request.method == "POST":
-        return Response({
-             "list_id":list_id,
-        })
+        product_check(data)
+        prod = Product(name=data["name"], quantity=data["quantity"], unit=data["unit"], bought=data["bought"],
+                       list_id=list_id)
+        prod.save()
+        if data["picture_base64"] is not None:
+            with open('pictures.json', 'r+') as f:
+                pics = json.load(f)
+                pics.append({"id": prod.id, "base64": data["picture_base64"]})
+                json.dump(pics, f, indent=4)
+        js = prod.json()
+        js["picture_base64"] = data["picture_base64"]
+        return Response({js})
 
 #/list/{list_id}/invite
 @api_view(['POST'])
@@ -175,6 +185,13 @@ def particip_endpoint(request,list_id):
             "users":list_of_users
         })
     
+
+def product_check(data):
+    # Check if data contains all fields
+    to_test = ["name", "quantity", "unit", "bought", "picture_base64"]
+    for i in range(len(to_test)):
+        if not to_test[i] in data:
+            return Response(status=400)
 
 def del_product(product): # The product needs to be removed from DB, but we also may need to remove the image
     id = product.id

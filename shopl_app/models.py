@@ -1,8 +1,5 @@
-from tokenize import Double
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager,PermissionsMixin
-from django.conf import settings
-import uuid
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
 class UserManager(BaseUserManager):
     def create_user(self, email,name, password=None):
@@ -73,7 +70,6 @@ class Product(models.Model):
     name = models.CharField(max_length=20)
     quantity = models.FloatField(null=True)
     unit = models.TextField(null=True)
-    picture_name = models.TextField(null=True)
     bought = models.BooleanField(default=False)
 
     class Meta:
@@ -85,8 +81,7 @@ class Product(models.Model):
             'name':self.name,
             'quantity':self.quantity,
             'unit':self.unit,
-            'bought':self.bought,
-            'picture_name':self.picture_name
+            'bought':self.bought
         }
 
 
