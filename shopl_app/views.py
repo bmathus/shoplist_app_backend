@@ -1,11 +1,9 @@
-from shopl_app import serializers
 from shopl_app.serializers import InviteCodeSerializer, ListNameSerializer,ProductPutSerializer,ProductPostSerializer
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view,permission_classes
 from rest_framework.response import Response
-from django.forms import model_to_dict
 from .models import User,List,Product
 from django.core.exceptions import ObjectDoesNotExist
 import json
@@ -19,7 +17,7 @@ class CustomAuthToken(ObtainAuthToken):
         try:
             user = serializer.validated_data['user']  
         except KeyError:
-            return Response(status=403)        
+            return Response(status=400)        
         token, created = Token.objects.get_or_create(user=user)
         return Response({
             'id': user.pk,
@@ -128,7 +126,7 @@ def product_endpoint(request,list_id,id):
                         else:
                             pics[i]["base64"] = data["picture_base64"] # Rewrite image
                         break
-                if not found:
+                if not found and data["picture_base64"] is not None:
                     pics.append({"id": prod.id, "base64": data["picture_base64"]})
                 f.seek(0)
                 f.truncate()
@@ -197,7 +195,7 @@ def invite_endpoint(request):
             return Response(ilist.json())
 
         else:
-            return Response({"detail":"invite code not valid"},status=400)
+            return Response({"detail":"Invite code not valid"},status=400)
           
 
 # /list/{list_id}/participants
