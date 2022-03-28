@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from shopl_app.models import List
+from shopl_app.models import List,Product
 import uuid
 
 class ListNameSerializer(serializers.ModelSerializer):
@@ -13,3 +13,19 @@ class ListNameSerializer(serializers.ModelSerializer):
 
 class InviteCodeSerializer(serializers.Serializer):
     invite_code = serializers.CharField()
+
+class ProductPutSerializer(serializers.ModelSerializer):
+    picture_base64 = serializers.CharField(allow_null=True)
+    class Meta:
+        model = Product
+        fields = ['name','quantity','unit','bought','picture_base64']
+    def create(self, validated_data):
+        return validated_data
+
+class ProductPostSerializer(serializers.ModelSerializer):
+    picture_base64 = serializers.CharField(allow_null=True)
+    class Meta:
+        model = Product
+        fields = ['name','quantity','unit','picture_base64']
+    def create(self, validated_data):
+        return validated_data

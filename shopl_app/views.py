@@ -1,5 +1,5 @@
 from shopl_app import serializers
-from shopl_app.serializers import InviteCodeSerializer, ListNameSerializer
+from shopl_app.serializers import InviteCodeSerializer, ListNameSerializer,ProductPutSerializer,ProductPostSerializer
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
@@ -104,36 +104,40 @@ def product_endpoint(request,list_id,id):
     try:
         prod = Product.objects.get(id=id)
     except ObjectDoesNotExist:
-        return Response(status=404)
+        return Response({"detail":"Product with this id does not exists"},status=404)
     if prod.list_id != list_id: # Produkt nie je v danom zozname
-        return Response(status=400) # spravny http status?
+        return Response({"detail":"Product not in list with this list_id"},status=400) # spravny http status?
     
     if request.method == 'PUT':
         data = request.data
-        if not product_check(data):
-            return Response(status=400)
-        prod.name = data["name"]
-        prod.quantity = data["quantity"]
-        prod.unit = data["unit"]
-        prod.bought = data["bought"]
-        with open('pictures.json', 'r+') as f:  # Finding the image reference
-            pics = json.load(f)
-            found = False
-            for i in range(len(pics)):
-                if pics[i]["id"] == id:
-                    found = True
-                    if data["picture_base64"] is None: # Delete reference from JSON file
-                        pics.pop(i)
-                    else:
-                        pics[i]["base64"] = data["picture_base64"] # Rewrite image
-                    break
-            if not found:
-                pics.append({"id": prod.id, "base64": data["picture_base64"]})
-            f.seek(0)
-            f.truncate()
-            json.dump(pics, f, indent=2)
-        prod.save()
-        return Response(status=200)
+        serializer = ProductPutSerializer(data=request.data)
+        if serializer.is_valid() and product_check(serializer.save()):
+            data = serializer.validated_data
+            prod.name = data["name"]
+            prod.quantity = data["quantity"]
+            prod.unit = data["unit"]
+            prod.bought = data["bought"]
+            with open('pictures.json', 'r+') as f:  # Finding the image reference
+                pics = json.load(f)
+                found = False
+                for i in range(len(pics)):
+                    if pics[i]["id"] == id:
+                        found = True
+                        if data["picture_base64"] is None: # Delete reference from JSON file
+                            pics.pop(i)
+                        else:
+                            pics[i]["base64"] = data["picture_base64"] # Rewrite image
+                        break
+                if not found:
+                    pics.append({"id": prod.id, "base64": data["picture_base64"]})
+                f.seek(0)
+                f.truncate()
+                json.dump(pics, f, indent=2)
+            prod.save()
+            return Response(status=200)
+        else:
+            return Response({"detail":"Not valid or missing fields"},status=400)
+
     if request.method == 'DELETE':
         del_product(prod)
         users_l.num_items -= 1
@@ -148,25 +152,27 @@ def product_add_endpoint(request,list_id):
     users_l = check_list(list_id, user)
     if not isinstance(users_l, List):
         return users_l
-    data = request.data
+
     if request.method == "POST":
-        if not product_check(data, False): # Bought is automatically False when created. No need to receive it
-            return Response(status=400)
-        prod = Product(name=data["name"], quantity=data["quantity"], unit=data["unit"], bought=False,
-                       list_id=list_id)
-        prod.save()
-        users_l.num_items += 1
-        users_l.save()
-        if data["picture_base64"] is not None:
-            with open('pictures.json', 'r+') as f:
-                pics = json.load(f)
-                pics.append({"id": prod.id, "base64": data["picture_base64"]})
-                f.seek(0)
-                f.truncate()
-                json.dump(pics, f, indent=2)
-        js = prod.json()
-        js["picture_base64"] = data["picture_base64"]
-        return Response(js)
+        serializer = ProductPostSerializer(data=request.data)
+        if serializer.is_valid() and product_check(serializer.save(),False):
+            data = serializer.validated_data
+            prod = Product.objects.create(name=data["name"], quantity=data["quantity"], unit=data["unit"], bought=False,
+                    list_id=list_id)
+            users_l.num_items += 1
+            users_l.save()
+            if data["picture_base64"] is not None:
+                with open('pictures.json', 'r+') as f:
+                    pics = json.load(f)
+                    pics.append({"id": prod.id, "base64": data["picture_base64"]})
+                    f.seek(0)
+                    f.truncate()
+                    json.dump(pics, f, indent=2)
+            js = prod.json()
+            js["picture_base64"] = data["picture_base64"]
+            return Response(js)
+        else:
+            return Response({"detail":"Not valid or missing fields"},status=400)
 
 # /invite
 @api_view(['POST'])
@@ -209,7 +215,6 @@ def particip_endpoint(request,list_id):
             "users":list_of_users
         })
     
-
 def product_check(data, include_bought=True):
     # Check if data contains all fields
     to_test = ["name", "quantity", "unit", "picture_base64"]
@@ -246,7 +251,7 @@ def check_list(list_id,user):
     try:
         users_l = user.user_lists.get(id=list_id)
     except ObjectDoesNotExist:
-        return Response(status=401)
+        return Response({"detail":"User not allowed in list"},status=401)
 
     return users_l
     
