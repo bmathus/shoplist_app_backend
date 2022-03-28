@@ -84,8 +84,6 @@ def list_endpoint(request,list_id):
             users_l.num_ppl -= 1
             users_l.save()
             msg = "User left the list"
-        ref = user.user_lists.get(list__id=list_id)  # Delete user_lists reference
-        ref.delete()
         return Response({
             "message": msg
             })
