@@ -80,12 +80,13 @@ def list_endpoint(request,list_id):
                 del_product(prods[i])
             users_l.delete()
             msg = "List deleted"
-        else: # Just remove the user
+        else: # Just remove the user from list
             users_l.num_ppl -= 1
             users_l.save()
+            user.user_lists.remove(users_l)
             msg = "User left the list"
         return Response({
-            "message": msg
+            "detail": msg
             })
 
 #/list/{list_id}/product/{id}
@@ -170,7 +171,7 @@ def product_add_endpoint(request,list_id):
         else:
             return Response({"detail":"Not valid or missing fields"},status=400)
 
-# /invite
+# list/invite
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def invite_endpoint(request):
@@ -250,16 +251,4 @@ def check_list(list_id,user):
         return Response({"detail":"User not allowed in list"},status=401)
 
     return users_l
-    
-
-
-
-
-
-
-
-
-
-
-
-    
+        
