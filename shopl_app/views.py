@@ -39,7 +39,7 @@ def lists_endpoint(request):
             user.user_lists.add(new_list)
             return Response(new_list.json())
         else:
-            return Response({"detail":"List name not valid"},status=400)
+            return Response({"detail":"List must have a name"},status=400)
     if request.method == 'GET':
         list_of_lists = [i.json() for i in user.user_lists.all()]
         return Response({
@@ -72,9 +72,7 @@ def list_endpoint(request,list_id):
             })
 
     if request.method == 'DELETE': # Leaving/deleting a shopping list
-        ppl = users_l.num_ppl
-        msg = ""
-        if ppl == 1: # A single person remains. We will delete this list
+        if users_l.num_ppl == 1: # A single person remains. We will delete this list
             prods = users_l.product_set.all()
             for i in range(len(prods)): # Delete all products from the list
                 del_product(prods[i])
@@ -101,12 +99,11 @@ def product_endpoint(request,list_id,id):
     try:
         prod = Product.objects.get(id=id)
     except ObjectDoesNotExist:
-        return Response({"detail":"Product with this id does not exists"},status=404)
+        return Response({"detail":"Product with this id does not exist"},status=404)
     if prod.list_id != list_id: # Produkt nie je v danom zozname
-        return Response({"detail":"Product not in list with this list_id"},status=400) # spravny http status?
+        return Response({"detail":"Product not in list with this list_id"},status=400)
     
     if request.method == 'PUT':
-        data = request.data
         serializer = ProductPutSerializer(data=request.data)
         if serializer.is_valid() and product_check(serializer.save()):
             data = serializer.validated_data
@@ -236,19 +233,16 @@ def del_product(product): # The product needs to be removed from DB, but we also
         json.dump(pics, f, indent=2) # Write it back into the file
 
 def check_list(list_id,user):
-    #check ci vobec list s danym id existuje - ak nie tak 400
+    # Check if the list exists
     try:
         l = List.objects.get(id=list_id)
     except ObjectDoesNotExist:
         return Response( 
             {"detail":"List does not exist"},
             status=404)
-
-    #check ci vobec user do daneho listu patri
+    # Check if user belongs to the list
     try:
         users_l = user.user_lists.get(id=list_id)
     except ObjectDoesNotExist:
         return Response({"detail":"User not allowed in list"},status=401)
-
     return users_l
-        
