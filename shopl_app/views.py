@@ -17,7 +17,7 @@ class CustomAuthToken(ObtainAuthToken):
         try:
             user = serializer.validated_data['user']  
         except KeyError:
-            return Response(status=400)        
+            return Response(status=401)        
         token, created = Token.objects.get_or_create(user=user)
         return Response({
             'id': user.pk,
@@ -39,7 +39,7 @@ def lists_endpoint(request):
             user.user_lists.add(new_list)
             return Response(new_list.json())
         else:
-            return Response(status=400)
+            return Response({"detail":"List name not valid"},status=400)
     if request.method == 'GET':
         list_of_lists = [i.json() for i in user.user_lists.all()]
         return Response({
@@ -183,7 +183,7 @@ def invite_endpoint(request):
             try:
                 ilist = List.objects.get(invite_code=invite_code)
             except ObjectDoesNotExist:
-                return Response({"detail": "List with the given invite code does not exist"},status=400)
+                return Response({"detail": "List with the given invite code does not exist"},status=404)
             try:
                 user.user_lists.get(id=ilist.id)
                 return Response({"detail": "You are already in this list."}, status=400)
@@ -242,7 +242,7 @@ def check_list(list_id,user):
     except ObjectDoesNotExist:
         return Response( 
             {"detail":"List does not exist"},
-            status=400)
+            status=404)
 
     #check ci vobec user do daneho listu patri
     try:
