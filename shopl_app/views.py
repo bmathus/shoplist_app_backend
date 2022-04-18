@@ -247,11 +247,14 @@ def create_room(request):
 @permission_classes([IsAuthenticated])
 def call_end(request):
     user = User.objects.get(email=request.user)
-    calluser = User.objects.get(email=user.called_user)
-    user.room_id = calluser.room_id = None
-    user.called_user = calluser.called_user = None
+    if user.called_user is not None:
+        calluser = User.objects.get(email=user.called_user)
+        calluser.room_id = None
+        calluser.called_user = None
+        calluser.save()
+    user.room_id = None
+    user.called_user = None
     user.save()
-    calluser.save()
     return Response(status=200)
     
 def product_check(data, include_bought=True):
