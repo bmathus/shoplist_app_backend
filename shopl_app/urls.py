@@ -8,5 +8,8 @@ urlpatterns = [
     path('list/<int:list_id>/product/<int:id>',views.product_endpoint),
     path('list/<int:list_id>/product',views.product_add_endpoint),
     path('list/invite',views.invite_endpoint),
-    path('list/<int:list_id>/participants',views.particip_endpoint)
+    path('list/<int:list_id>/participants',views.particip_endpoint),
+    path('call/<int:user_id>',views.call_room_check),
+    path('call',views.create_room),
+    path('call/end',views.call_end)
 ]

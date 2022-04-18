@@ -48,6 +48,8 @@ class User(AbstractBaseUser):
     name = models.CharField(max_length=20, default='Anonymous')
     email = models.EmailField(max_length=50, unique=True)
     user_lists = models.ManyToManyField(List,db_table="user_lists")
+    room_id = models.CharField(max_length=50, default=None, null=True)
+    called_user = models.CharField(max_length=50, default=None, null=True)
 
     username = None
     last_login = None

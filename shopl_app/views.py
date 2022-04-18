@@ -208,6 +208,51 @@ def particip_endpoint(request,list_id):
         return Response({
             "users":list_of_users
         })
+
+
+# call/<int:user_id>
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def call_room_check(request, user_id):
+    calluser = User.objects.get(id=user_id)
+    user = User.objects.get(email=request.user)
+    if calluser == user:
+        return Response({"detail": "You cannot call yourself"}, status=400)
+    if request.method == "GET":
+        if calluser.called_user is None or calluser.called_user == user.email:
+            # If None is returned, user must create a room. Otherwise existing room is returned.
+            if calluser.called_user == user.email:
+                user.room_id = calluser.room_id
+                user.called_user = calluser.email
+                calluser.save()
+                user.save()
+            return Response({"room_id": calluser.room_id}, status=200)
+        else:
+            return Response({"detail": "The user is already in a call"}, status=400)
+
+# call
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_room(request):
+    user = User.objects.get(email=request.user)
+    if request.method == "POST":
+        data = request.data
+        user.room_id = data["room_id"]
+        user.called_user = data["called_user"]
+        user.save()
+    return Response(status=200)
+
+# call/end
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def call_end(request):
+    user = User.objects.get(email=request.user)
+    calluser = User.objects.get(email=user.called_user)
+    user.room_id = calluser.room_id = None
+    user.called_user = calluser.called_user = None
+    user.save()
+    calluser.save()
+    return Response(status=200)
     
 def product_check(data, include_bought=True):
     # Check if data contains all fields
