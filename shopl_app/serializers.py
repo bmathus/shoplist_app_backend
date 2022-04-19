@@ -8,7 +8,7 @@ class ListNameSerializer(serializers.ModelSerializer):
         model = List
         fields = ['name',]
     def create(self, validated_data):
-        random_uuid = str(uuid.uuid4())
+        random_uuid = str(uuid.uuid4())[:8]
         return List.objects.create(**validated_data,invite_code=random_uuid)
 
 class InviteCodeSerializer(serializers.Serializer):

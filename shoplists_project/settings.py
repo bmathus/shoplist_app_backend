@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-$vt9jb_$j5_yn&48+q@zy!+egr2%3ub7kux%*@+7qff(i-t5=4
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["my-app-wsmue.ondigitalocean.app", "localhost"]
+ALLOWED_HOSTS = ["*","my-app-wsmue.ondigitalocean.app","10.0.2.2","127.0.0.1","localhost"]
 
 
 # Application definition
@@ -91,11 +91,11 @@ WSGI_APPLICATION = 'shoplists_project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'MTAA',
-        'USER': 'postgres',
-        'PASSWORD': 'sudruh',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASS'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': os.getenv('DB_PORT'),
         #'OPTIONS': {'sslmode': 'require'},
     }
 }
