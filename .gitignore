@@ -1,2 +1,4 @@
 shoplists_project/settings.py
 .idea/workspace.xml
+venv/
+shopl_app/__pycache__
